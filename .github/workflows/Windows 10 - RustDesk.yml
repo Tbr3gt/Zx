@@ -1,18 +1,30 @@
-name: Windows - RustDesk
-
 on:
-  workflow_dispatch:
+ workflow_dispatch:
+    inputs:
+      ipAddress:
+        description: 'IP Address of the VPS'
+        required: true
+        default: '127.0.0.1'
 
 jobs:
-  build:
+ build:
     name: Start Building...
     runs-on: windows-latest
     timeout-minutes: 9999
     
     steps:
-      - name: Downloading & Installing Essentials
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install wget
         run: |
-          Invoke-WebRequest -Uri "https://www.dropbox.com/scl/fi/qdyd4p9t6xoabl95n5o3g/Downloads.bat?rlkey=snr74vv1vr8k5suujugvrhjtm&dl=1" -OutFile "Downloads.bat"
+          wget --no-check-certificate -O wget.zip https://github.com/Gowee/wget/releases/download/1.20.3-1/wget.zip
+          tar -xvf wget.zip -C .
+          copy wget.exe /usr/local/bin
+
+      - name: Download & Install Essentials
+        run: |
+          wget -O Downloads.bat https://raw.githubusercontent.com/username/repository/main/Downloads.bat
           cmd /c Downloads.bat
 
       - name: Log In To AnyDesk
